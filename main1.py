@@ -3,7 +3,7 @@ from ursina.prefabs.first_person_controller import FirstPersonController
 
 app = Ursina()
 from settings import *
-from models import Block, Map
+from models import Block, Map, Player
 
 sky = Sky(texture=' sky_sunset')
 sun = DirectionalLight(shadows=True)
@@ -19,6 +19,6 @@ ground = Entity(model='plane', collider='box', scale=150, texture='grass', textu
 ground.y=-5
 
 
-player = FirstPersonController()
+player = Player()
 window.fullscreen = True
 app.run()

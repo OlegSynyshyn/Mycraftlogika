@@ -24,6 +24,8 @@ class Tree(Button):
 
 
 class Block(Button):
+
+    current = DEFAULT_BLOCK
     def __init__(self, pos, texture_id=3, **kwargs):
         super().__init__(parent=scene,
                          color=color.color(0,0, random.uniform(0.9, 1)),
@@ -47,8 +49,42 @@ class Map(Entity):
         for x in range(MAP_SIZE):
             for z in range(MAP_SIZE):
                 y = floor(self.noise([x/24, z/24])*6)
-                cube = Block((x, y, z), 3)
+                cube = Block((x, y, z), DEFAULT_BLOCK)
+
                 rand_num = random.randint(1,TREE_DENSITY)
                 if rand_num == 75:
                     Tree((x,y+1,z))
 
+
+
+
+class Player(FirstPersonController):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.held_block = Entity(model='cube', texture=block_textures[Block.current], parent=camera.ui,
+                                 position=(0.75, -0.4), rotation=Vec3(0, 0, 0),
+                                 shader=basic_lighting_shader,
+                                 scale = 0.2
+                                 )
+
+
+    def input(self, key):
+        super().input(key)
+
+        if key == "left mouse down" and mouse.hovered_entity:
+            destroy(mouse.hovered_entity)
+
+        if key == "right mouse down" and mouse.hovered_entity:
+            hit_info = raycast(camera.world_position, camera.forward, distance=10)
+            if hit_info.hit and isinstance(hit_info.entity, Block):
+                Block(hit_info.entity.position + hit_info.normal, Block.current)
+        if key == "scroll up":
+            Block.current += 1
+            if Block.current >= len(block_textures):
+                Block.current = 0
+            self.held_block.texture = block_textures[Block.current]
+        if key == "scroll down":
+            Block.current -= 1
+            if Block.current < 0:
+                Block.current = len(block_textures)-1
+            self.held_block.texture = block_textures[Block.current]
