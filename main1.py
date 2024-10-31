@@ -3,7 +3,7 @@ from ursina.prefabs.first_person_controller import FirstPersonController
 
 app = Ursina()
 from settings import *
-from models import Block, Map, Player
+from models import *
 
 sky = Sky(texture=' sky_sunset')
 sun = DirectionalLight(shadows=True)
