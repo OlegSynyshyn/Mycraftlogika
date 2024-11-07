@@ -6,6 +6,7 @@ from settings import *
 from ursina.shaders import basic_lighting_shader
 from perlin_noise import PerlinNoise
 from numpy import floor
+import pickle
 
 
 class Tree(Button):
@@ -26,8 +27,8 @@ class Tree(Button):
 class Block(Button):
 
     current = DEFAULT_BLOCK
-    def __init__(self, pos, texture_id=3, **kwargs):
-        super().__init__(parent=scene,
+    def __init__(self, pos, texture_id=3, parent=scene, **kwargs):
+        super().__init__(parent=parent,
                          color=color.color(0,0, random.uniform(0.9, 1)),
                          highlight_color=color.gray,
                          model='cube',
@@ -38,6 +39,7 @@ class Block(Button):
                          origin_y=-.5,
                          shader = basic_lighting_shader,
                          **kwargs)
+        scene.blocks[(self.x, self.y, self.z)] = texture_id
 
 class Map(Entity):
     def __init__(self, **kwargs):
@@ -46,6 +48,7 @@ class Map(Entity):
         self.ground = Entity(model='plane', collider='box', position =(MAP_SIZE//2, -3, MAP_SIZE//2), scale=MAP_SIZE, texture=block_textures[1], texture_scale=(4,4))
         self.ground.y=-3
         self.noise = PerlinNoise(octaves=2, seed=3505)
+        self.bg_musik = Audio(sound_file_name='Soundtrack\sky-in-the-night-slow-ambient-music-minecraft-music-231465.mp3' , autoplay=True, loop=True, volume=0.2)
 
     def generate(self):
         for x in range(MAP_SIZE):
@@ -64,6 +67,8 @@ class Player(FirstPersonController):
     def __init__(self, map, **kwargs):
         super().__init__(**kwargs)
         self.map = map
+        self.build_sound = Audio(sound_file_name='Soundtrack\wood02.ogg' , autoplay=False)
+        self.destroy_sound = Audio(sound_file_name='Soundtrack\mud02.ogg' , autoplay=False)
         self.creative_mode = False
         self.held_block = Entity(model='cube', texture=block_textures[Block.current], parent=camera.ui,
                                  position=(0.75, -0.4), rotation=Vec3(0, 0, 0),
@@ -77,12 +82,14 @@ class Player(FirstPersonController):
         super().input(key)
 
         if key == "left mouse down" and mouse.hovered_entity and mouse.hovered_entity != self.map.ground:
+            self.destroy_sound.play()
             destroy(mouse.hovered_entity)
 
         if key == "right mouse down" and mouse.hovered_entity:
             hit_info = raycast(camera.world_position, camera.forward, distance=10)
             if hit_info.hit and isinstance(hit_info.entity, Block):
                 Block(hit_info.entity.position + hit_info.normal, Block.current)
+                self.build_sound.play()
         if key == "scroll up":
             Block.current += 1
             if Block.current >= len(block_textures):
@@ -126,3 +133,14 @@ class Player(FirstPersonController):
             self.z = MAP_SIZE//2
             self.x = MAP_SIZE//2
             print_on_screen("ERROR", position=(-0.88, 0.58), origin=(-.5, 5), scale=1, duration=1)
+
+        if not self.creative_mode:
+            if self.x > MAP_SIZE:
+                self.x = MAP_SIZE
+            if self.z > MAP_SIZE:
+                self.z = MAP_SIZE
+
+            if self.x < 0:
+                self.x = 0
+            if self.z < 0:
+                self.z = 0
