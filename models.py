@@ -21,6 +21,7 @@ class Tree(Button):
                          origin_y=.5,
                          shader = basic_lighting_shader,
                          **kwargs)
+        scene.trees[(self.x, self.y, self.z)] = self
 
 
 
@@ -39,7 +40,8 @@ class Block(Button):
                          origin_y=-.5,
                          shader = basic_lighting_shader,
                          **kwargs)
-        scene.blocks[(self.x, self.y, self.z)] = texture_id
+        self.id = texture_id
+        scene.blocks[(self.x, self.y, self.z)] = self
 
 class Map(Entity):
     def __init__(self, **kwargs):
@@ -82,9 +84,17 @@ class Player(FirstPersonController):
         super().input(key)
 
         if key == "left mouse down" and mouse.hovered_entity and mouse.hovered_entity != self.map.ground:
-            self.destroy_sound.play()
-            destroy(mouse.hovered_entity)
+            if isinstance(mouse.hovered_entity, Block):
+                x,y,z = mouse.hovered_entity.position
+                del scene.blocks[(x,y,z)]
+            elif isinstance(mouse.hovered_entity, Tree):
+                x,y,z = mouse.hovered_entity.position
+                del scene.trees[(x,y,z)]    
 
+            destroy(mouse.hovered_entity)
+            self.destroy_sound.play()
+
+            
         if key == "right mouse down" and mouse.hovered_entity:
             hit_info = raycast(camera.world_position, camera.forward, distance=10)
             if hit_info.hit and isinstance(hit_info.entity, Block):
