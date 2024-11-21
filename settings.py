@@ -2,7 +2,7 @@ import os
 from ursina import load_texture
 
 block_textures = []
-DEFAULT_BLOCK = 2
+DEFAULT_BLOCK = 0
 
 MAP_SIZE = 30
 TREE_DENSITY= 150

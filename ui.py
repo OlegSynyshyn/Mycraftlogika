@@ -8,7 +8,7 @@ class MenuButton(Button):
                          scale=(0.6, 0.1),
                          origin=(0, 0),
                          ignore_paused=True,
-                         texture='blocks\stone.png',
+                         texture='button.png',
                          color=color.color(0, 0, random.uniform(0.9, 1)),
                          highlight_color=color.gray,
                          highlight_scale=1.05,
@@ -25,10 +25,10 @@ class Menu(Entity):
         self.title = Text(text="Minecraft", scale=5,
                           parent=self, origin=(0, 0), x=0, y=0.35)
         
-        MenuButton("New game", application.quit, 0, 0.15, self)
-        MenuButton("Load", application.quit, 0, 0.02, self)
-        MenuButton("Save", application.quit, 0, -0.11, self)
-        MenuButton("Exit", application.quit, 0, 0.02, self)
+        MenuButton("New game", game.new_game, 0, 0.15, self)
+        MenuButton("Load", game.load, 0, 0.02, self)
+        MenuButton("Save", game.save, 0, -0.11, self)
+        MenuButton("Exit", application.quit, 0, -0.24, self)
 
 
     def toggle_menu(self):

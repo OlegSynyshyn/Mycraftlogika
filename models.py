@@ -114,9 +114,9 @@ class Player(FirstPersonController):
         if key == 'c':
             self.creative_mode = not self.creative_mode
             if self.creative_mode:
-                print_on_screen("Креативний режим: ON", position=(-0.88, 0.58), origin=(-.5, 5), scale=1, duration=1)
+                print_on_screen("Creative Mode: ON", position=(-0.88, 0.58), origin=(-.5, 5), scale=1, duration=1)
             else:
-                print_on_screen("Креативний режим: OFF", position=(-0.88, 0.58), origin=(-.5, 5), scale=1, duration=1)
+                print_on_screen("Creative Mode: OFF", position=(-0.88, 0.58), origin=(-.5, 5), scale=1, duration=1)
 
     def update(self):
         super().update()
